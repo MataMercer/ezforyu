@@ -1,7 +1,14 @@
 import json
+import logging
 import time
 import urllib
 import requests
+
+logging.basicConfig(
+    filename=f'{time.strftime("%Y-%m-%d-%H-%M-%S")}debug.log',
+    level=logging.DEBUG,
+    format="%(asctime)s:%(levelname)s:%(message)s", filemode='w'
+)
 
 
 def getAllCoupons(storeId, accessToken):
@@ -33,7 +40,7 @@ def getAllCoupons(storeId, accessToken):
 
     response = requests.get('https://www.vons.com/abs/pub/xapi/offers/companiongalleryoffer', headers=headers,
                             params=params)
-    print(f'[Request]: get coupons status code: {response.status_code}')
+    logging.debug(f'[Request]: get coupons status code: {response.status_code}')
     return response.json()['companionGalleryOffer']
 
 
@@ -69,7 +76,8 @@ def addCouponById(offerId, storeId, offerType, accessToken):
     response = requests.post('https://www.vons.com/abs/pub/web/j4u/api/offers/clip', headers=headers, params=params,
                              json=json_data)
 
-    print(f'[Request]: Add coupon status code: {response.status_code}')
+    logging.debug(f'[Request]: Add coupon status code: {response.status_code}')
+
     return response.json()
 
 
@@ -109,7 +117,7 @@ def getSessionToken(loginData):
 
     response = requests.post('https://albertsons.okta.com/api/v1/authn', headers=headers, json=json_data)
 
-    print(f'[Request]: Login status code: {response.status_code}')
+    logging.debug(f'[Request]: Login status code: {response.status_code}')
     return response.json()['sessionToken']
 
 
@@ -157,7 +165,7 @@ def getAccessToken(sessionToken):
     location = authCodeRes.headers['Location']
 
     accessTokenRes = requests.get(location, allow_redirects=False)
-    print(f'[Request]: Get access token status code: {accessTokenRes.status_code}')
+    logging.debug(f'[Request]: Get access token status code: {accessTokenRes.status_code}')
 
     encodedJsonTokenCookie = accessTokenRes.cookies.get_dict()['SWY_SHARED_SESSION']
     jsonTokenCookie = parseUrlEncodedJson(encodedJsonTokenCookie)
@@ -200,9 +208,9 @@ def main():
             couponId = getCouponId(coupon)
             couponType = getCouponType(coupon)
             addCouponById(offerId=couponId, storeId=2090, offerType=couponType, accessToken=accessToken)
-            print(f'Coupon with id of {couponId} added!')
+            logging.debug(f'Coupon with id of {couponId} added!')
         time.sleep(1)
-    print('Completed')
+    logging.debug('Completed')
 
 
 if __name__ == '__main__':
