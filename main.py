@@ -1,13 +1,18 @@
 import json
 import logging
+import os
 import smtplib
 import time
 import urllib
 from email.mime.text import MIMEText
 import requests
 
+
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+logging_file_name = os.path.join(ROOT_DIR, f'{time.strftime("%Y-%m-%d-%H-%M-%S")}debug.log')
+
 logging.basicConfig(
-    filename=f'{time.strftime("%Y-%m-%d-%H-%M-%S")}debug.log',
+    filename=logging_file_name,
     level=logging.DEBUG,
     format="%(asctime)s:%(levelname)s:%(message)s", filemode='w'
 )
@@ -181,8 +186,9 @@ def parse_url_encoded_json(encoded):
     return json.loads(unencoded)
 
 
-def get_json_from_file(filename):
-    f = open(filename, encoding='utf-8')
+def get_json_from_file(file_name):
+    abs_file_name = os.path.join(ROOT_DIR, file_name)
+    f = open(abs_file_name, encoding='utf-8')
     return json.load(f)
 
 
